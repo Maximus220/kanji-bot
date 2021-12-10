@@ -30,6 +30,17 @@ const bgColors = [
     "#4bb781"
 ]
 
+//DEBUG
+
+const TWEET_IMAGE = true;
+const COUNTDOWN = 1000 * 60 * 60 * 24;
+const SAVE_IMAGE = true;
+const LAUNCH_ON_START = true;
+const FONT_NAME = "K_Gothic";
+
+//
+//
+//
 
 var loadFont = new Promise((resolve, reject)=>{ //Promise that loads fonts (check if promise is really useful or if function'd be better in that specific case)
     fs.readdir(fontPath, function(err, files){
@@ -64,12 +75,18 @@ async function generateKanji(){
 
     }while(tempValue)
 
-    kanjiCanvas(kanji, "K_Gothic");
+    kanjiCanvas(kanji, FONT_NAME);
     //saveCanvas(kanji, kanjiImg);
 
 
 }
-generateKanji();
+
+if(LAUNCH_ON_START) generateKanji();
+if(COUNTDOWN){
+    setInterval(function(){
+        generateKanji();
+    }, COUNTDOWN);
+}
 
 
 async function kanjiCanvas(kanji, font){
@@ -113,14 +130,16 @@ async function kanjiCanvas(kanji, font){
     ctx.fillText(kanji.type, canvas.width/2, canvas.height/2 - 375);
 
     //Tweet kanji
-    tweetKanji(canvas);
+    if(TWEET_IMAGE) tweetKanji(canvas);
 
     //Save image
-    if(!fs.existsSync(kanjiPath)){
-        fs.mkdirSync(kanjiPath);
+    if(SAVE_IMAGE){
+        if(!fs.existsSync(kanjiPath)){
+            fs.mkdirSync(kanjiPath);
+        }
+        var buffer = canvas.toBuffer('image/png');
+        fs.writeFileSync(kanjiPath+"/"+kanji.meaning[0]+".png", buffer);
     }
-    var buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(kanjiPath+"/"+kanji.meaning[0]+".png", buffer);
 }
 
 function getLines(ctx, text, maxWidth, font) {
