@@ -33,10 +33,12 @@ const bgColors = [
 //DEBUG
 
 const TWEET_IMAGE = true;
-const COUNTDOWN = 1000 * 60 * 60 * 24;
+const COUNTDOWN = 1000 * 60 * 60; //each hour
 const SAVE_IMAGE = true;
 const LAUNCH_ON_START = true;
 const FONT_NAME = "K_Gothic";
+
+const K = 2; //Scaling (e.g. 2 -> 2000x2000)
 
 //
 //
@@ -94,7 +96,7 @@ async function kanjiCanvas(kanji, font){
     if(fonts.length == 0) await loadFont;
 
     //Prepare image
-    canvas = createCanvas(1000, 1000);
+    canvas = createCanvas(1000 * K, 1000 * K);
     ctx = canvas.getContext('2d');
     ctx.fillStyle = bgColors[getRand(0,bgColors.length-1)];
     ctx.fillRect(0,0,canvas.width, canvas.height);
@@ -105,29 +107,29 @@ async function kanjiCanvas(kanji, font){
     ctx.fillStyle = '#ffffff';
 
     if(kanji.kanji){
-        ctx.font = 'bold 175px ' + font;
-        ctx.fillText(kanji.kanji, canvas.width/2, canvas.height/2 - 100);
+        ctx.font = 'bold '+(175 * K)+'px ' + font;
+        ctx.fillText(kanji.kanji, canvas.width/2, canvas.height/2 - 100 * K);
 
-        ctx.font = 'bold 100px ' + font;
+        ctx.font = 'bold '+(100 * K)+'px ' + font;
         ctx.fillStyle = '#f5f5f5';
-        ctx.fillText(kanji.reading, canvas.width/2, canvas.height/2 + 50);
+        ctx.fillText(kanji.reading, canvas.width/2, canvas.height/2 + 50 * K);
     }else{
-        ctx.font = 'bold 175px ' + font;
-        ctx.fillText(kanji.reading, canvas.width/2, canvas.height/2 - 100);
+        ctx.font = 'bold '+(175 * K)+'px ' + font;
+        ctx.fillText(kanji.reading, canvas.width/2, canvas.height/2 - 100 * K);
     }
 
-    var lines = getLines(ctx, kanji.meaning.join(", "), 800, font);
+    var lines = getLines(ctx, kanji.meaning.join(", "), 800 * K, font);
     lines[0].forEach((line,i) =>{
         ctx.fillText(line, canvas.width/2, 
             canvas.height/2 + 
-            200 + 
-            ((lines[1] + 10)*i) //Line size + 10 * placing (line index)
+            200 * K + 
+            ((lines[1] + 10 * K)*i) //Line size + 10 * placing (line index)
         );
     });
 
-    ctx.font = 'bold 75px ' + font;
+    ctx.font = 'bold '+(75 * K)+'px ' + font;
     ctx.fillStyle = '#262626';
-    ctx.fillText(kanji.type, canvas.width/2, canvas.height/2 - 375);
+    ctx.fillText(kanji.type, canvas.width/2, canvas.height/2 - 375 * K);
 
     //Tweet kanji
     if(TWEET_IMAGE) tweetKanji(canvas);
@@ -143,10 +145,10 @@ async function kanjiCanvas(kanji, font){
 }
 
 function getLines(ctx, text, maxWidth, font) {
-    ctx.font = 'bold 100px ' + font;
+    ctx.font = 'bold '+(100 * K)+'px ' + font;
     let it=0;
     do{
-        if(it!==0) ctx.font = 'bold '+(100-(10*it))+'px ' + font;
+        if(it!==0) ctx.font = 'bold '+(100 * K-(10 * K*it))+'px ' + font;
         var words = text.split(" ");
         var lines = [];
         var currentLine = words[0];
@@ -164,7 +166,7 @@ function getLines(ctx, text, maxWidth, font) {
         lines.push(currentLine);
         it++;
     }while(lines.length>3)
-    return [lines, (100-(10*it))];
+    return [lines, (100 * K-(10 * K*it))];
 }
 
 function getRand(min, max){ //Included
